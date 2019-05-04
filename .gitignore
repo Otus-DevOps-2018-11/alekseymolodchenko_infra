@@ -10,3 +10,12 @@ variables.json
 .gce_cache
 jdauphant.nginx
 vault.key
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
+.pytest_cache
+.venv
+.yamllint
+.sonarlint

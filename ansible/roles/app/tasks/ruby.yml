@@ -1,0 +1,12 @@
+---
+# https://docs.ansible.com/ansible/latest/modules/apt_module.html
+- name: Install Ruby/Bundler and dependencies
+  apt:
+    name: "{{ packages }}"
+    update_cache: yes
+  vars:
+    packages:
+      - ruby-full
+      - ruby-bundler
+      - build-essential
+  tags: ruby

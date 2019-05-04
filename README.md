@@ -422,8 +422,16 @@ connection {
 
 clone.yml
 ```
-```
+---
+- name: Clone
+  hosts: app
+  tasks:
+    - name: Clone repo
+      git:
+        repo: https://github.com/express42/reddit.git
+        dest: /home/appuser/reddit
 
+```
 
 #### 2. Использование dynamic inventory
 
@@ -432,12 +440,12 @@ clone.yml
 inventory.json
 ```
 {
-	"app": {
-		"hosts": ["34.76.71.112"]
-	},
-	"db": {
-		"hosts": ["35.195.164.228"]
-	}
+  "app": {
+  "hosts": ["34.76.71.112"]
+  },
+  "db": {
+    "hosts": ["35.195.164.228"]
+  }
 }
 ```
 
@@ -471,7 +479,7 @@ enable_plugins = host_list, script, yaml, ini
 Проверка
 
 ```
-git:(ansible-1*) $ ansible all -m ping
+$ ansible all -m ping
 
 34.76.71.112 | SUCCESS => {
     "changed": false,
@@ -534,3 +542,58 @@ packer/db.json
     }
   ]
 ```
+
+## Разработка и тестирование Ansible ролей и плейбуков
+
+### Локальная разработка с Vagrant
+
+- Установлен Vagrant;
+  ```bash
+  $ vagrant -v
+  Vagrant 2.2.3
+  ```
+- Добавлен ansible/Vagrantfile;
+- Созданы VM's appserver и dbserver с помощью Vagrant;
+- Добавлен playbook base.yml для установки python;
+- Для роли db добалены файлы тасков install_mongo.yml и config_mongo.yml;
+- Для роли app добалены файлы тасков puma.yml и ruby.yml. Добавлен параметр для деплоя пользователя;
+
+#### Задание со *
+
+- Дабавлено проксирования запросов с nginx
+
+  <details><summary>Пример</summary><p>
+
+  ```ruby
+
+    ansible.extra_vars = {
+      "deploy_user" => "ubuntu",
+      "nginx_sites" => {
+          "default" => [
+           "listen 80 default_server",
+            "server_name raddit",
+            "location / { proxy_pass http://127.0.0.1:9292; }"
+          ]
+        }
+    }
+
+  ```
+
+  </p></details>
+
+#### Самостоятельное задание
+
+- К роли db добавлен тест проверки доступности БД по порту 27017
+
+  <details><summary>Тест</summary><p>
+
+  ```python
+
+  def test_mongodb_listening_port(host):
+    port = host.socket('tcp://27017')
+    assert port.is_listening
+
+  ```
+
+  </p></details>
+

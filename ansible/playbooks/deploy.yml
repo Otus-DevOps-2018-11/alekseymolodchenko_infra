@@ -7,7 +7,7 @@
     - name: Fetch latest application version
       git:
         repo: 'https://github.com/express42/reddit.git'
-        dest: /home/appuser/reddit
+        dest: '/home/{{ deploy_user }}/reddit'
         version: monolith
       tags: deploy-tag
       notify: reload puma
@@ -16,7 +16,7 @@
     - name: Bundler install
       bundler:
         state: present
-        chdir: /home/appuser/reddit
+        chdir: '/home/{{ deploy_user }}/reddit'
       register: bundler_install_result # https://docs.ansible.com/ansible-lint/rules/default_rules.html E405
       until: bundler_install_result is succeeded
   handlers:
